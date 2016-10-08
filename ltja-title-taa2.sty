@@ -3,6 +3,19 @@
 
 \@ifpackageloaded{ltja-mdframed}{\relax}{\RequirePackage{ltja-mdframed}}
 
+%% Global indentation option
+\newif\if@ltjahandouttitlesans\@ltjahandouttitlesansfalse
+\DeclareOption{titlesans}{
+	\@ltjahandouttitlesanstrue
+}
+
+\newcommand{\ltjahandouttitle@switchtosans}{\if@ltjahandouttitlesans\sffamily\else\relax\fi}
+
+\ExecuteOptions{}
+
+\ProcessOptions\relax
+
+
 % define pretitle
 \newcommand{\@pretitle}{}
 \newcommand{\pretitle}[1]{\makeatletter\renewcommand{\@pretitle}{#1}\makeatother}
@@ -26,18 +39,18 @@
 \def\@maketitle{%
 	\newpage\null
 	\let\footnote\thanks
-	\ifdefempty{\@pretitle}{}{\setlength{\parindent}{0pt}\@pretitle}
-		\begin{mdframed}[style=taa2, frametitle={\@title}]
-			\begin{flushleft}
-				\setlength{\baselineskip}{12pt}
-				\ifdefempty{\@posttitle}{}{\@posttitle\linebreak}%
-				\begin{tabular}[t]{@{}ccccccccccccccccccccc}%
-					\@author
-				\end{tabular}
-				\linebreak%
-				{\@date}%
-			\end{flushleft}
-	\end{mdframed}%
+	{\ltjahandouttitle@switchtosans%
+		\ifdefempty{\@pretitle}{}{\setlength{\parindent}{0pt}\@pretitle}
+			\begin{mdframed}[style=taa2, frametitle={\ltjahandouttitle@switchtosans\@title}]
+				\begin{flushleft}
+					\ifdefempty{\@posttitle}{}{\@posttitle\linebreak}%
+					\begin{tabular}[t]{@{}ccccccccccccccccccccc}%
+						\@author
+					\end{tabular}
+					\linebreak%
+					{\@date}%
+				\end{flushleft}
+	\end{mdframed}}%
 	\ifvoid\@abstractbox\else\centerline{\box\@abstractbox}\vskip1.5em\fi}
 
 % pagestyle hack
