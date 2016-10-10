@@ -1,0 +1,60 @@
+\ProvidesPackage{ltja-title-taa}[2016/10/10 Tatsuya HAYASHI]
+\NeedsTeXFormat{LaTeX2e}
+
+\@ifpackageloaded{ltja-mdframed}{\relax}{\RequirePackage{ltja-mdframed}}
+
+%% Global indentation option
+\newif\if@ltjahandouttitlesans\@ltjahandouttitlesansfalse
+\DeclareOption{titlesans}{
+	\@ltjahandouttitlesanstrue
+}
+
+\newcommand{\ltjahandouttitle@switchtosans}{\if@ltjahandouttitlesans\sffamily\else\relax\fi}
+
+\ExecuteOptions{}
+
+\ProcessOptions\relax
+
+
+% define pretitle
+\newcommand{\@pretitle}{}
+\newcommand{\pretitle}[1]{\makeatletter\renewcommand{\@pretitle}{#1}\makeatother}
+
+% define posttitle
+\newcommand{\@posttitle}{}
+\newcommand{\posttitle}[1]{\makeatletter\renewcommand{\@posttitle}{#1}\makeatother}
+
+% release them when maketitle is done
+% by overriding \maketitle
+\let\ltjahandouttitle@maketitle\maketitle
+\renewcommand{\maketitle}{%
+	\makeatletter\ltjahandouttitle@maketitle\makeatother
+    \global\let\@pretitle\@empty
+    \global\let\@posttitle\@empty
+    \global\let\pretitle\relax
+    \global\let\posttitle\relax
+}
+
+% override \@maketitle, which is executed when @titlepalgefalse
+\def\@maketitle{%
+	\newpage\null
+	\let\footnote\thanks
+	{\ltjahandouttitle@switchtosans%
+				\begin{mdframed}[style=taa]
+				\begin{flushleft}
+					\ifdefempty{\@pretitle}{}{\@pretitle\linebreak}
+					{\huge \@title \linebreak}%
+					\ifdefempty{\@posttitle}{}{\@posttitle\linebreak}
+					\begin{tabular}[t]{@{}ccccccccccccccccccccc}%
+						\@author
+					\end{tabular}
+					\linebreak%
+					{\@date}%
+				\end{flushleft}
+	\end{mdframed}}%
+	\ifvoid\@abstractbox\else\centerline{\box\@abstractbox}\fi}
+
+% pagestyle hack
+%\let\oldmaketitle\maketitle
+%\renewcommand{\maketitle}{\oldmaketitle\pagestyle{hd}}
+%\endinput
